@@ -15,7 +15,7 @@ from bitex.api.WSS.base import WSSAPI
 
 # import Server-side Exceptions
 from bitex.api.WSS.exceptions import InvalidBookLengthError, GenericSubscriptionError
-from bitex.api.WSS.exceptions import NotSubscribedError,  AlreadySubscribedError
+from bitex.api.WSS.exceptions import NotSubscribedError, AlreadySubscribedError
 from bitex.api.WSS.exceptions import InvalidPairError, InvalidChannelError
 from bitex.api.WSS.exceptions import InvalidEventError, InvalidBookPrecisionError
 
@@ -340,7 +340,11 @@ class BitfinexWSS(WSSAPI):
                 if not skip_processing:
                     log.debug("Processing Data: %s", data)
                     if isinstance(data, list):
-                        self.handle_data(ts, data)
+                        try:
+                            self.handle_data(ts, data)
+                        except Exception as eee:
+                            log.exception("handle_data error")
+                            self._controller_q.put('restart')
                     else:  # Not a list, hence it could be a response
                         try:
                             self.handle_response(ts, data)
@@ -400,7 +404,7 @@ class BitfinexWSS(WSSAPI):
             # unsupported event!
             raise UnknownEventError("handle_response(): %s" % resp)
 
-    def _handle_subscribed(self, *args,  chanId=None, channel=None, **kwargs):
+    def _handle_subscribed(self, *args, chanId=None, channel=None, **kwargs):
         """
         Handles responses to subscribe() commands - registers a channel id with
         the client and assigns a data handler to it.
@@ -414,7 +418,7 @@ class BitfinexWSS(WSSAPI):
         self._heartbeats[chanId] = time.time()
 
         try:
-            channel_key = ('raw_'+channel
+            channel_key = ('raw_' + channel
                            if kwargs['prec'].startswith('R') and channel == 'book'
                            else channel)
         except KeyError:
