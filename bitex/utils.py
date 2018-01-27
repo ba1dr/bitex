@@ -66,3 +66,14 @@ def return_api_response(formatter=None):
 
         return wrapper
     return decorator
+
+
+def log_fail(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except:
+            log.exception("Error")
+            raise
+    return wrapper

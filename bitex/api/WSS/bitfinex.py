@@ -12,6 +12,7 @@ from websocket import WebSocketConnectionClosedException
 
 # Import Homebrew
 from bitex.api.WSS.base import WSSAPI
+from bitex.utils import log_fail
 
 # import Server-side Exceptions
 from bitex.api.WSS.exceptions import InvalidBookLengthError, GenericSubscriptionError
@@ -274,6 +275,7 @@ class BitfinexWSS(WSSAPI):
             for channel_name, kwargs in channel_labels:
                 self._subscribe(channel_name, **kwargs)
 
+    @log_fail
     def receive(self):
         """
         Receives incoming websocket messages, and puts them on the Client queue
@@ -304,6 +306,7 @@ class BitfinexWSS(WSSAPI):
                 # The receiver_lock was locked, idling until available
                 time.sleep(0.5)
 
+    @log_fail
     def process(self):
         """
         Processes the Client queue, and passes the data to the respective

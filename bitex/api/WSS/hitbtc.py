@@ -1,4 +1,4 @@
-#import Built-Ins
+# import Built-Ins
 import logging
 from threading import Thread
 from queue import Queue, Empty
@@ -68,7 +68,7 @@ class HitBTCWSS(WSSAPI):
             try:
                 data = conn.recv()
                 data = json.loads(data)
-            except WebSocketTimeoutException:
+            except (WebSocketTimeoutException, WebSocketConnectionClosedException):
                 self._controller_q.put('restart_data')
                 return
             try:
