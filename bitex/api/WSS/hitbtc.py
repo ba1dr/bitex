@@ -7,7 +7,7 @@ import time
 import hmac
 import hashlib
 # Import Third-Party
-from websocket import create_connection, WebSocketTimeoutException
+from websocket import create_connection, WebSocketTimeoutException, WebSocketConnectionClosedException
 
 # Import Homebrew
 from bitex.api.WSS.base import WSSAPI
